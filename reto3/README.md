@@ -26,7 +26,7 @@ docker build -t reto3 .
 ## Ejecución del contenedor
 
 ```bash
-docker run -it usuarios-lab
+docker run -it reto3
 ```
 
 ---
