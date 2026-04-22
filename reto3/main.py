@@ -6,9 +6,7 @@ def run_command(cmd):
     result = subprocess.run(cmd, capture_output=True, text=True)
     return result.returncode, result.stdout.strip(), result.stderr.strip()
 
-# -----------------------------
 # VALIDACIÓN DE CONTRASEÑA
-# -----------------------------
 def validar_password(password):
     if " " in password:
         return False, "No puede tener espacios"
@@ -20,24 +18,22 @@ def validar_password(password):
         return False, "Debe tener al menos 8 caracteres"
     return True, ""
 
-# -----------------------------
 # VERIFICAR USUARIO
-# -----------------------------
 def usuario_existe(nombre):
     code, _, _ = run_command(["id", nombre])
     return code == 0
 
-# -----------------------------
 # CREAR USUARIO
-# -----------------------------
 def crear_usuario():
     nombre = input("Nombre de usuario: ")
 
     if usuario_existe(nombre):
-        print("⚠️ El usuario ya existe.")
+        print("El usuario ya existe.")
         return
 
     password = "Default123!"
+    #contraseña simple Abc123!@
+    #contraseña más compleja: Q7#xL9!mP2
 
     run_command(["useradd", "-m", nombre])
     run_command(["bash", "-c", f"echo '{nombre}:{password}' | chpasswd"])
@@ -47,72 +43,60 @@ def crear_usuario():
 
     print(f"Usuario {nombre} creado con contraseña por defecto.")
 
-# -----------------------------
 # LISTAR USUARIOS
-# -----------------------------
 def listar_usuarios():
     _, out, _ = run_command(["cut", "-d:", "-f1", "/etc/passwd"])
     print(out)
 
-# -----------------------------
 # BLOQUEAR USUARIO
-# -----------------------------
 def bloquear_usuario():
     nombre = input("Usuario a bloquear: ")
 
     if not usuario_existe(nombre):
-        print("⚠️ Usuario no existe.")
+        print("Usuario no existe.")
         return
 
     run_command(["usermod", "-L", nombre])
     print("Usuario bloqueado.")
 
-# -----------------------------
 # ACTIVAR USUARIO
-# -----------------------------
 def activar_usuario():
     nombre = input("Usuario a activar: ")
 
     if not usuario_existe(nombre):
-        print("⚠️ Usuario no existe.")
+        print("Usuario no existe.")
         return
 
     run_command(["usermod", "-U", nombre])
     print("Usuario activado.")
 
-# -----------------------------
 # ELIMINAR USUARIO
-# -----------------------------
 def eliminar_usuario():
     nombre = input("Usuario a eliminar: ")
 
     if not usuario_existe(nombre):
-        print("⚠️ Usuario no existe.")
+        print("Usuario no existe.")
         return
 
     run_command(["userdel", "-r", nombre])
     print("Usuario eliminado.")
 
-# -----------------------------
 # SUDOERS
-# -----------------------------
 def agregar_sudo():
     nombre = input("Usuario: ")
 
     if not usuario_existe(nombre):
-        print("⚠️ Usuario no existe.")
+        print("Usuario no existe.")
         return
 
     try:
         with open("/etc/sudoers.d/lab", "a") as f:
-            f.write(f"{nombre} ALL=(ALL) NOPASSWD: /usr/bin/python3 /app/app.py\n")
+            f.write(f"{nombre} ALL=(ALL) NOPASSWD: /usr/bin/python3 /app/main.py\n")
         print("Usuario agregado a sudoers.")
     except Exception as e:
         print(f"Error: {e}")
 
-# -----------------------------
 # MENU
-# -----------------------------
 def menu():
     while True:
         print("""
@@ -143,9 +127,7 @@ def menu():
         else:
             print("Opción inválida")
 
-# -----------------------------
 # MAIN
-# -----------------------------
 if __name__ == "__main__":
     if subprocess.run(["id", "-u"], capture_output=True, text=True).stdout.strip() != "0":
         print("Debe ejecutar como root.")
