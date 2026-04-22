@@ -45,13 +45,13 @@ python3 main.py
 
 ### 1. Políticas de contraseña (PAM)
 
-Se edita automaticamente el archivo:
+Editar el archivo:
 
 ```bash
 nano /etc/pam.d/common-password
 ```
 
-Agregando la línea:
+Agregar o modificar la línea:
 
 ```bash
 password requisite pam_pwquality.so retry=3 minlen=8 ucredit=-1 ocredit=-1
