@@ -1,0 +1,122 @@
+services:
+  db:
+    image: postgres:16
+    container_name: concurrency-db
+    environment:
+      POSTGRES_DB: concurrency_lab
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d concurrency_lab"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  db-init:
+    image: postgres:16
+    container_name: concurrency-db-init
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: postgres
+    volumes:
+      - ./database/init.sql:/init.sql
+    command: >
+      psql
+      -h db
+      -U postgres
+      -d concurrency_lab
+      -f /init.sql
+
+  worker-1:
+    build: .
+    container_name: worker-1
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      WORKER_ID: worker-1
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: concurrency_lab
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      LOG_DIR: /shared_logs
+    volumes:
+      - ./shared_logs:/shared_logs
+
+  worker-2:
+    build: .
+    container_name: worker-2
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      WORKER_ID: worker-2
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: concurrency_lab
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      LOG_DIR: /shared_logs
+    volumes:
+      - ./shared_logs:/shared_logs
+
+  worker-3:
+    build: .
+    container_name: worker-3
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      WORKER_ID: worker-3
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: concurrency_lab
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      LOG_DIR: /shared_logs
+    volumes:
+      - ./shared_logs:/shared_logs
+
+  worker-4:
+    build: .
+    container_name: worker-4
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      WORKER_ID: worker-4
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: concurrency_lab
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      LOG_DIR: /shared_logs
+    volumes:
+      - ./shared_logs:/shared_logs
+
+  worker-5:
+    build: .
+    container_name: worker-5
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      WORKER_ID: worker-5
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: concurrency_lab
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      LOG_DIR: /shared_logs
+    volumes:
+      - ./shared_logs:/shared_logs
+
+volumes:
+  postgres_data:
